@@ -1,0 +1,106 @@
+name: Update Image Tag
+
+on:
+  repository_dispatch:
+    types:
+      - image-published
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-image-tag
+  cancel-in-progress: false
+
+jobs:
+  update-image-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Prepare image tag file
+        run: |
+          if [ ! -f env/image-tags.env ]; then
+            cp env/image-tags.env.example env/image-tags.env
+          fi
+
+      - name: Update service image/tag
+        shell: bash
+        env:
+          SERVICE: ${{ github.event.client_payload.service }}
+          IMAGE: ${{ github.event.client_payload.image }}
+          TAG: ${{ github.event.client_payload.tag }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${SERVICE}" || -z "${TAG}" ]]; then
+            echo "service/tag payload is required" >&2
+            exit 1
+          fi
+
+          to_prefix() {
+            case "$1" in
+              user-service) echo "USER_SERVICE" ;;
+              order-service) echo "ORDER_SERVICE" ;;
+              worker-schedule-service|schedule-service) echo "WORKER_SCHEDULE_SERVICE" ;;
+              dispatch-service) echo "DISPATCH_SERVICE" ;;
+              execution-record-service|execution-service) echo "EXECUTION_RECORD_SERVICE" ;;
+              payment-settlement-service|payment-service) echo "PAYMENT_SETTLEMENT_SERVICE" ;;
+              frontend) echo "FRONTEND" ;;
+              *)
+                echo "Unsupported service: $1" >&2
+                exit 1
+                ;;
+            esac
+          }
+
+          upsert() {
+            local key="$1"
+            local value="$2"
+            local escaped
+            escaped="$(printf '%s' "${value}" | sed 's/[&|]/\\&/g')"
+
+            if grep -qE "^${key}=" env/image-tags.env; then
+              sed -i "s|^${key}=.*|${key}=${escaped}|" env/image-tags.env
+            else
+              echo "${key}=${value}" >> env/image-tags.env
+            fi
+          }
+
+          prefix="$(to_prefix "${SERVICE}")"
+
+          if [[ -z "${IMAGE}" ]]; then
+            current_image="$(grep -E "^${prefix}_IMAGE=" env/image-tags.env | cut -d'=' -f2- || true)"
+            if [[ -z "${current_image}" ]]; then
+              IMAGE="ghcr.io/nus-iss-capstone-hsp/${SERVICE}"
+            else
+              IMAGE="${current_image}"
+            fi
+          fi
+
+          upsert "${prefix}_IMAGE" "${IMAGE}"
+          upsert "${prefix}_TAG" "${TAG}"
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet -- env/image-tags.env; then
+            echo "No image tag changes detected."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          service="${{ github.event.client_payload.service }}"
+          tag="${{ github.event.client_payload.tag }}"
+
+          git add env/image-tags.env
+          git commit -m "chore(images): bump ${service} to ${tag}"
+          git push

@@ -1,0 +1,29 @@
+services:
+  mysql:
+    ports: []
+
+  user-service:
+    ports: []
+
+  order-service:
+    ports: []
+
+  worker-schedule-service:
+    ports: []
+
+  dispatch-service:
+    ports: []
+
+  execution-record-service:
+    ports: []
+
+  payment-settlement-service:
+    ports: []
+
+  # frontend:
+  #   ports: []
+
+  nginx:
+    ports:
+      - "80:${NGINX_HTTP_PORT}"
+      - "443:${NGINX_HTTPS_PORT}"

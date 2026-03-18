@@ -1,0 +1,16 @@
+.DS_Store
+
+# Local compose overrides
+docker-compose.override.yml
+
+# Local environment overrides
+env/*.local.env
+
+# Local database bind-mount paths (if used)
+mysql/data/
+mysql/.data/
+
+# Temporary files
+*.log
+tmp/
+

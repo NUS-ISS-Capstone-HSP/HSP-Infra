@@ -1,0 +1,34 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy by SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.PROD_SSH_HOST }}
+          username: ${{ secrets.PROD_SSH_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -eu
+            cd "${{ secrets.PROD_INFRA_PATH }}"
+            git fetch origin main
+            git checkout main
+            git pull --ff-only origin main
+            docker compose --env-file env/prod.env --env-file env/image-tags.env -f docker-compose.yml -f docker-compose.prod.yml pull
+            docker compose --env-file env/prod.env --env-file env/image-tags.env -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
