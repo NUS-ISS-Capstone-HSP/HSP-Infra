@@ -37,3 +37,28 @@ jobs:
             echo "${{ secrets.ALIYUN_PASSWORD }}" | docker login "${{ secrets.ALIYUN_REGISTRY }}" -u "${{ secrets.ALIYUN_USERNAME }}" --password-stdin
             docker compose --env-file env/prod.env --env-file env/image-tags.env -f docker-compose.yml -f docker-compose.prod.yml pull
             docker compose --env-file env/prod.env --env-file env/image-tags.env -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
+
+  api-interface-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    needs:
+      - deploy
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run echo interface tests through nginx
+        shell: bash
+        env:
+          PROD_API_BASE_URL: ${{ secrets.PROD_API_BASE_URL }}
+          PROD_SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${PROD_API_BASE_URL}" ]]; then
+            export ECHO_TEST_BASE_URL="${PROD_API_BASE_URL}"
+          else
+            export ECHO_TEST_BASE_URL="http://${PROD_SSH_HOST}:80"
+          fi
+          bash ./scripts/integration/echo-api-tests.sh
