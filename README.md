@@ -29,6 +29,19 @@ cp env/image-tags.env.example env/image-tags.env
 
 This starts only `mysql` from compose so you can run one backend service locally.
 
+## Start DB in Debug Mode (Expose 3306 to Host)
+
+```bash
+./scripts/db-debug-up.sh
+```
+
+This starts only `mysql` and maps container MySQL port to host:
+
+- host: `localhost:${MYSQL_HOST_PORT}`
+- container: `${MYSQL_PORT}`
+
+Default from `env/dev.env` is `localhost:3306`.
+
 ## Environment Files
 
 - `env/dev.env`: local compose variables and host port mapping
