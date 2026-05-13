@@ -35,11 +35,4 @@ wait_http_ok() {
   return 1
 }
 
-wait_http_ok "user-service" "http://localhost:${USER_SERVICE_HOST_PORT}${USER_SERVICE_HEALTH_PATH}"
-wait_http_ok "order-service" "http://localhost:${ORDER_SERVICE_HOST_PORT}${ORDER_SERVICE_HEALTH_PATH}"
-wait_http_ok "worker-schedule-service" "http://localhost:${WORKER_SCHEDULE_SERVICE_HOST_PORT}${WORKER_SCHEDULE_SERVICE_HEALTH_PATH}"
-wait_http_ok "dispatch-service" "http://localhost:${DISPATCH_SERVICE_HOST_PORT}${DISPATCH_SERVICE_HEALTH_PATH}"
-wait_http_ok "execution-record-service" "http://localhost:${EXECUTION_RECORD_SERVICE_HOST_PORT}${EXECUTION_RECORD_SERVICE_HEALTH_PATH}"
-wait_http_ok "payment-settlement-service" "http://localhost:${PAYMENT_SETTLEMENT_SERVICE_HOST_PORT}${PAYMENT_SETTLEMENT_SERVICE_HEALTH_PATH}"
-wait_http_ok "frontend" "http://localhost:${FRONTEND_HOST_PORT}/"
-wait_http_ok "nginx" "http://localhost:${NGINX_HOST_PORT}/"
+wait_http_ok "api-gateway via nginx" "http://localhost:${NGINX_HOST_PORT}${API_GATEWAY_NGINX_HEALTH_PATH}"

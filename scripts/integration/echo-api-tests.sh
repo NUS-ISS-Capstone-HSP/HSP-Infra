@@ -8,6 +8,7 @@ NGINX_CONF="${ROOT_DIR}/nginx/conf.d/default.conf"
 ECHO_TEST_BASE_URL="${ECHO_TEST_BASE_URL:-http://localhost:8080}"
 ECHO_TEST_MAX_ATTEMPTS="${ECHO_TEST_MAX_ATTEMPTS:-20}"
 ECHO_TEST_RETRY_INTERVAL_SECONDS="${ECHO_TEST_RETRY_INTERVAL_SECONDS:-3}"
+ECHO_TEST_DEFAULT_SERVICE_PREFIXES="/api/users /api/orders /api/dispatch /api/payment /api/schedule"
 
 require_cmd() {
   local cmd="$1"
@@ -18,6 +19,11 @@ require_cmd() {
 }
 
 extract_service_prefixes() {
+  if [[ -n "${ECHO_TEST_SERVICE_PREFIXES:-}" ]]; then
+    read -r -a SERVICE_PREFIXES <<< "${ECHO_TEST_SERVICE_PREFIXES}"
+    return
+  fi
+
   if [[ ! -f "${NGINX_CONF}" ]]; then
     echo "[ERROR] Missing nginx config: ${NGINX_CONF}" >&2
     exit 1
@@ -30,8 +36,7 @@ extract_service_prefixes() {
   )
 
   if (( ${#SERVICE_PREFIXES[@]} == 0 )); then
-    echo "[ERROR] No /api/* routes found in ${NGINX_CONF}" >&2
-    exit 1
+    read -r -a SERVICE_PREFIXES <<< "${ECHO_TEST_DEFAULT_SERVICE_PREFIXES}"
   fi
 }
 

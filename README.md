@@ -2,6 +2,7 @@
 
 HSP-Infra is an assembly-only repository for running the full system together:
 
+- api-gateway
 - user-service
 - order-service
 - worker-schedule-service
@@ -50,13 +51,14 @@ Default from `env/dev.env` is `localhost:3306`.
 
 ## Gateway Routes
 
-- `/api/users/*` -> `user-service`
-- `/api/orders/*` -> `order-service`
-- `/api/dispatch/*` -> `dispatch-service`
-- `/api/payment/*` -> `payment-settlement-service`
-- `/api/execution/*` -> `execution-record-service`
-- `/api/schedule/*` -> `worker-schedule-service`
-- `/` -> `frontend`
+- `/api/*` -> `api-gateway`
+- `api-gateway` calls backend services over gRPC:
+  - `user-service:50051`
+  - `order-service:50052`
+  - `payment-settlement-service:50053`
+  - `dispatch-service:50054`
+  - `worker-schedule-service:50055`
+- `/api/healthz` -> `api-gateway:/healthz`
 
 ## CI/CD Workflows
 
@@ -74,8 +76,8 @@ curl -X POST \
   -d '{
     "event_type": "image-published",
     "client_payload": {
-      "service": "user-service",
-      "image": "ghcr.io/nus-iss-capstone-hsp/user-service",
+      "service": "api-gateway",
+      "image": "ghcr.io/nus-iss-capstone-hsp/api-gateway",
       "tag": "v1.2.3"
     }
   }'
@@ -83,10 +85,15 @@ curl -X POST \
 
 ## Production Secrets (GitHub Actions)
 
-Set these repository/environment secrets before enabling production deployment:
+Set these Organization secrets and grant this repository access before enabling production deployment:
 
 - `PROD_SSH_HOST`
 - `PROD_SSH_USER`
 - `PROD_SSH_KEY`
 - `PROD_SSH_PORT` (optional, default 22)
 - `PROD_INFRA_PATH` (absolute path of infra repo on target host)
+- `PROD_GATEWAY_JWT_SECRET`
+- `ALIYUN_REGISTRY`
+- `ALIYUN_USERNAME`
+- `ALIYUN_PASSWORD`
+- `ALIYUN_NAMESPACE`

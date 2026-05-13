@@ -25,8 +25,4 @@ assert_http_ok() {
 
 "${SCRIPT_DIR}/wait-for-health.sh"
 
-assert_http_ok "Users service direct" "http://localhost:${USER_SERVICE_HOST_PORT}${USER_SERVICE_HEALTH_PATH}"
-assert_http_ok "Orders service direct" "http://localhost:${ORDER_SERVICE_HOST_PORT}${ORDER_SERVICE_HEALTH_PATH}"
-assert_http_ok "Frontend via gateway" "http://localhost:${NGINX_HOST_PORT}${SMOKE_FRONTEND_PATH}"
-assert_http_ok "Users API via gateway" "http://localhost:${NGINX_HOST_PORT}${SMOKE_USERS_PATH}"
-assert_http_ok "Orders API via gateway" "http://localhost:${NGINX_HOST_PORT}${SMOKE_ORDERS_PATH}"
+assert_http_ok "API Gateway via nginx" "http://localhost:${NGINX_HOST_PORT}${SMOKE_GATEWAY_HEALTH_PATH}"

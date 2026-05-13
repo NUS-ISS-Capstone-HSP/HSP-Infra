@@ -50,6 +50,7 @@ jobs:
               dispatch-service) echo "DISPATCH_SERVICE" ;;
               execution-record-service|execution-service) echo "EXECUTION_RECORD_SERVICE" ;;
               payment-settlement-service|payment-service) echo "PAYMENT_SETTLEMENT_SERVICE" ;;
+              api-gateway|gateway) echo "API_GATEWAY" ;;
               frontend) echo "FRONTEND" ;;
               *)
                 echo "Unsupported service: $1" >&2
