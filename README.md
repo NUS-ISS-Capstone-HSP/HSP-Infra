@@ -52,6 +52,9 @@ Default from `env/dev.env` is `localhost:3306`.
 ## Gateway Routes
 
 - `/api/*` -> `api-gateway`
+- `/docs` -> `api-gateway:/docs`
+- `/redoc` -> `api-gateway:/redoc`
+- `/openapi.json` -> `api-gateway:/openapi.json`
 - `api-gateway` calls backend services over gRPC:
   - `user-service:50051`
   - `order-service:50052`

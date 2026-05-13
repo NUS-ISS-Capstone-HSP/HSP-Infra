@@ -38,6 +38,7 @@ jobs:
             export GATEWAY_JWT_SECRET="${{ secrets.PROD_GATEWAY_JWT_SECRET }}"
             docker compose --env-file env/prod.env --env-file env/image-tags.env -f docker-compose.yml -f docker-compose.prod.yml pull
             docker compose --env-file env/prod.env --env-file env/image-tags.env -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
+            docker exec hsp-nginx nginx -s reload
 
   api-interface-test:
     runs-on: ubuntu-latest
