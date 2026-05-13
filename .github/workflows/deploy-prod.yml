@@ -88,6 +88,7 @@ jobs:
           script: |
             set -eu
             cd "${{ secrets.PROD_INFRA_PATH }}"
+            export GATEWAY_JWT_SECRET="${{ secrets.PROD_GATEWAY_JWT_SECRET }}"
             docker compose --env-file env/prod.env --env-file env/image-tags.env -f docker-compose.yml -f docker-compose.prod.yml pull
 
       - name: Recreate production stack
