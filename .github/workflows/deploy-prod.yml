@@ -117,8 +117,8 @@ jobs:
             set -eu
             docker exec hsp-nginx nginx -s reload
 
-  api-interface-test:
-    name: Post-deploy verification placeholders
+  prepare-verification-context:
+    name: Prepare verification context
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
@@ -126,24 +126,66 @@ jobs:
       - deploy
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Prepare verification context
         run: echo "still in progress"
 
+  gateway-health-check:
+    name: Gateway health check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    needs:
+      - prepare-verification-context
+
+    steps:
       - name: Gateway health check
         run: echo "still in progress"
 
+  api-interface-tests:
+    name: API interface tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    needs:
+      - gateway-health-check
+
+    steps:
       - name: API interface tests
         run: echo "still in progress"
 
+  integration-test-suite:
+    name: Integration test suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    needs:
+      - api-interface-tests
+
+    steps:
       - name: Integration test suite
         run: echo "still in progress"
 
+  frontend-smoke-test:
+    name: Frontend smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    needs:
+      - integration-test-suite
+
+    steps:
       - name: Frontend smoke test
         run: echo "still in progress"
 
+  publish-verification-summary:
+    name: Publish verification summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    needs:
+      - frontend-smoke-test
+
+    steps:
       - name: Publish verification summary
         shell: bash
         run: |
