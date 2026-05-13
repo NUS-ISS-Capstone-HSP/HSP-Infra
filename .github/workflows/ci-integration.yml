@@ -46,7 +46,7 @@ jobs:
 
       - name: Dump logs on failure
         if: failure()
-        run: docker compose -f docker-compose.yml logs --tail=200
+        run: docker compose --env-file env/dev.env --env-file env/image-tags.env -f docker-compose.yml logs --tail=200
 
       - name: Cleanup
         if: always()
