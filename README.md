@@ -22,6 +22,15 @@ cp env/image-tags.env.example env/image-tags.env
 ./scripts/dev-down.sh --volumes
 ```
 
+## Frontend Smoke Test
+
+```bash
+npm ci
+npx playwright install chromium firefox webkit chrome
+HSP_SMOKE_BASE_URL=https://your-production-host \
+npm run test:smoke
+```
+
 ## Start DB Only (Local Backend Dev)
 
 ```bash
@@ -96,6 +105,7 @@ Set these Organization secrets and grant this repository access before enabling 
 - `PROD_SSH_PORT` (optional, default 22)
 - `PROD_INFRA_PATH` (absolute path of infra repo on target host)
 - `PROD_GATEWAY_JWT_SECRET`
+- `PROD_FRONTEND_BASE_URL`
 - `ALIYUN_REGISTRY`
 - `ALIYUN_USERNAME`
 - `ALIYUN_PASSWORD`

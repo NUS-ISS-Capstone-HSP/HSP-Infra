@@ -223,6 +223,7 @@ services:
       - "${NGINX_SSL_HOST_PORT}:${NGINX_HTTPS_PORT}" # 443:443
     volumes:
       - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - /var/www/hsp-web-frontend:/var/www/hsp-web-frontend:ro
     networks:
       - hsp-net
 

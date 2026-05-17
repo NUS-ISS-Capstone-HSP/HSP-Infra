@@ -14,3 +14,7 @@ mysql/.data/
 *.log
 tmp/
 
+# Node / Playwright
+node_modules/
+playwright-report/
+test-results/

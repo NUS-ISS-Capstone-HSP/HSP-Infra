@@ -1,0 +1,14 @@
+{
+  "name": "hsp-infra",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Infrastructure orchestration and deployment verification for HSP.",
+  "scripts": {
+    "test:smoke": "playwright test",
+    "test:smoke:chromium": "playwright test --project=chromium",
+    "test:smoke:headed": "playwright test --project=chromium --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.53.0"
+  }
+}
