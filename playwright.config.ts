@@ -1,13 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
 
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`${name} is required for frontend smoke tests.`);
-  }
-  return value;
-}
-
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -18,7 +10,7 @@ export default defineConfig({
     ? [['list'], ['html', { open: 'never' }]]
     : [['html', { open: 'never' }]],
   use: {
-    baseURL: requireEnv('HSP_SMOKE_BASE_URL'),
+    baseURL: 'http://115.190.232.179',
     trace: 'on-first-retry',
   },
 

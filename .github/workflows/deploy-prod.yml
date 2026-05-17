@@ -29,7 +29,6 @@ jobs:
           ALIYUN_PASSWORD: ${{ secrets.ALIYUN_PASSWORD }}
           ALIYUN_NAMESPACE: ${{ secrets.ALIYUN_NAMESPACE }}
           PROD_GATEWAY_JWT_SECRET: ${{ secrets.PROD_GATEWAY_JWT_SECRET }}
-          PROD_FRONTEND_BASE_URL: ${{ secrets.PROD_FRONTEND_BASE_URL }}
         run: |
           set -euo pipefail
           required=(
@@ -42,7 +41,6 @@ jobs:
             ALIYUN_PASSWORD
             ALIYUN_NAMESPACE
             PROD_GATEWAY_JWT_SECRET
-            PROD_FRONTEND_BASE_URL
           )
 
           for key in "${required[@]}"; do
@@ -192,8 +190,6 @@ jobs:
         run: npx playwright install --with-deps chromium firefox webkit chrome
 
       - name: Run frontend smoke test
-        env:
-          HSP_SMOKE_BASE_URL: ${{ secrets.PROD_FRONTEND_BASE_URL }}
         run: npm run test:smoke
 
       - name: Upload Playwright report
