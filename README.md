@@ -30,6 +30,24 @@ npx playwright install chromium firefox webkit chrome
 npm run test:smoke
 ```
 
+## Dispatch API Interface Test
+
+```bash
+DISPATCH_TEST_EMAIL="<email>" \
+DISPATCH_TEST_PASSWORD="<password>" \
+DISPATCH_TEST_ORDER_ID="<order_id>" \
+./scripts/integration/dispatch-api-tests.sh
+```
+
+Optional variables:
+
+- `DISPATCH_API_BASE_URL`: API gateway base URL, defaults to local nginx from `env/dev.env`
+- `DISPATCH_API_TESTS_ENABLED`: set to `false` to skip the CD API interface test
+- `DISPATCH_TEST_WORKER_ID`: fixed worker id; otherwise the script picks the first available worker
+- `DISPATCH_TEST_SERVICE_TYPE`, `DISPATCH_TEST_REGION`, `DISPATCH_TEST_AT_TIME`, `DISPATCH_TEST_LIMIT`: filters for `/api/dispatch/v1/workers/available`
+
+Use a disposable or dedicated test order for `DISPATCH_TEST_ORDER_ID`; the manual assignment endpoint changes dispatch state.
+
 ## Start DB Only (Local Backend Dev)
 
 ```bash
@@ -104,6 +122,10 @@ Set these Organization secrets and grant this repository access before enabling 
 - `PROD_SSH_PORT` (optional, default 22)
 - `PROD_INFRA_PATH` (absolute path of infra repo on target host)
 - `PROD_GATEWAY_JWT_SECRET`
+- `PROD_API_BASE_URL`
+- `DISPATCH_TEST_EMAIL`
+- `DISPATCH_TEST_PASSWORD`
+- `DISPATCH_TEST_ORDER_ID`
 - `ALIYUN_REGISTRY`
 - `ALIYUN_USERNAME`
 - `ALIYUN_PASSWORD`
