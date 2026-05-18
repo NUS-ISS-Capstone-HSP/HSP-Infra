@@ -121,7 +121,7 @@ Set these Organization secrets and grant this repository access before enabling 
 - `PROD_SSH_KEY`
 - `PROD_SSH_PORT` (optional, default 22)
 - `PROD_INFRA_PATH` (absolute path of infra repo on target host)
-- `PROD_GATEWAY_JWT_SECRET`
+- `PROD_GATEWAY_JWT_SECRET` (shared by api-gateway and user-service JWT signing)
 - `PROD_API_BASE_URL`
 - `DISPATCH_TEST_EMAIL`
 - `DISPATCH_TEST_PASSWORD`
