@@ -1,0 +1,22 @@
+meta {
+  name: 17 Verify Order Detail
+  type: http
+  seq: 17
+}
+
+get {
+  url: {{baseUrl}}/api/orders/v1/orders/{{orderId}}
+  body: none
+  auth: none
+}
+
+headers {
+  authorization: Bearer {{customerServiceToken}}
+}
+
+tests {
+  test("order detail can be fetched", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.nested.property("order.order_id");
+  });
+}

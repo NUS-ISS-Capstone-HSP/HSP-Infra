@@ -1,0 +1,34 @@
+meta {
+  name: 03 Login Customer Service
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/users/v1/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "email": "{{customerServiceEmail}}",
+    "password": "{{testPassword}}"
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  bru.setVar("customerServiceToken", body.access_token);
+}
+
+tests {
+  test("customer service login returns a bearer token", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("access_token").that.is.a("string").and.is.not.empty;
+  });
+}

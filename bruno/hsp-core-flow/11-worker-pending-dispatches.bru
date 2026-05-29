@@ -1,0 +1,21 @@
+meta {
+  name: 11 Worker Pending Dispatches
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/dispatch/v1/worker/pending-dispatches
+  body: none
+  auth: none
+}
+
+headers {
+  authorization: Bearer {{workerToken}}
+}
+
+tests {
+  test("worker can list pending dispatches", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

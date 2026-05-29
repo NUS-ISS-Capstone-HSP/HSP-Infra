@@ -1,0 +1,38 @@
+meta {
+  name: 15 Confirm Payment
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseUrl}}/api/finance/v1/orders/{{orderId}}/payments
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{customerServiceToken}}
+}
+
+body:json {
+  {
+    "amount": {{paymentAmount}},
+    "currency": "CNY",
+    "payment_method": "WECHAT",
+    "paid_at": "{{paidAt}}",
+    "remark": "Bruno core flow payment confirmation"
+  }
+}
+
+script:post-response {
+  const payment = res.getBody().payment || {};
+  bru.setVar("paymentId", payment.payment_id);
+}
+
+tests {
+  test("payment is confirmed", function () {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+    expect(res.getBody()).to.have.nested.property("payment.payment_id").that.is.a("string").and.is.not.empty;
+  });
+}

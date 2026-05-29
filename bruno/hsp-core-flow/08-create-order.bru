@@ -1,0 +1,39 @@
+meta {
+  name: 08 Create Order
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/orders/v1/orders
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{customerServiceToken}}
+}
+
+body:json {
+  {
+    "customer_name": "{{customerName}}",
+    "phone": "{{phone}}",
+    "service_address": "{{serviceAddress}}",
+    "service_type": "{{serviceType}}",
+    "appointment_time": "{{appointmentTime}}",
+    "estimated_duration_minutes": 90
+  }
+}
+
+script:post-response {
+  const order = res.getBody().order || {};
+  bru.setVar("orderId", order.order_id);
+}
+
+tests {
+  test("order is created", function () {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+    expect(res.getBody()).to.have.nested.property("order.order_id").that.is.a("string").and.is.not.empty;
+  });
+}

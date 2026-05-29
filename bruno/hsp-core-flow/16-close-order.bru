@@ -1,0 +1,30 @@
+meta {
+  name: 16 Close Order
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{baseUrl}}/api/orders/v1/orders/{{orderId}}/close
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{customerServiceToken}}
+}
+
+body:json {
+  {
+    "payment_id": "{{paymentId}}",
+    "close_reason": "Bruno core flow completed and paid"
+  }
+}
+
+tests {
+  test("order is closed as paid", function () {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+    expect(res.getBody()).to.have.nested.property("order.order_id");
+  });
+}

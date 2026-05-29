@@ -156,17 +156,11 @@ jobs:
       - name: Validate API interface test inputs
         shell: bash
         env:
-          DISPATCH_API_BASE_URL: ${{ secrets.PROD_API_BASE_URL }}
-          DISPATCH_TEST_EMAIL: ${{ secrets.DISPATCH_TEST_EMAIL }}
-          DISPATCH_TEST_PASSWORD: ${{ secrets.DISPATCH_TEST_PASSWORD }}
-          DISPATCH_TEST_ORDER_ID: ${{ secrets.DISPATCH_TEST_ORDER_ID }}
+          BRUNO_API_BASE_URL: ${{ secrets.PROD_API_BASE_URL }}
         run: |
           set -euo pipefail
           required=(
-            DISPATCH_API_BASE_URL
-            DISPATCH_TEST_EMAIL
-            DISPATCH_TEST_PASSWORD
-            DISPATCH_TEST_ORDER_ID
+            BRUNO_API_BASE_URL
           )
 
           for key in "${required[@]}"; do
@@ -176,20 +170,17 @@ jobs:
             fi
           done
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: API interface tests
         shell: bash
         env:
-          DISPATCH_API_BASE_URL: ${{ secrets.PROD_API_BASE_URL }}
-          DISPATCH_TEST_EMAIL: ${{ secrets.DISPATCH_TEST_EMAIL }}
-          DISPATCH_TEST_PASSWORD: ${{ secrets.DISPATCH_TEST_PASSWORD }}
-          DISPATCH_TEST_ORDER_ID: ${{ secrets.DISPATCH_TEST_ORDER_ID }}
-          DISPATCH_API_TESTS_ENABLED: ${{ vars.DISPATCH_API_TESTS_ENABLED || 'true' }}
-          DISPATCH_TEST_WORKER_ID: ${{ vars.DISPATCH_TEST_WORKER_ID }}
-          DISPATCH_TEST_SERVICE_TYPE: ${{ vars.DISPATCH_TEST_SERVICE_TYPE }}
-          DISPATCH_TEST_REGION: ${{ vars.DISPATCH_TEST_REGION }}
-          DISPATCH_TEST_AT_TIME: ${{ vars.DISPATCH_TEST_AT_TIME }}
-          DISPATCH_TEST_LIMIT: ${{ vars.DISPATCH_TEST_LIMIT || 20 }}
-        run: ./scripts/integration/dispatch-api-tests.sh
+          BRUNO_API_BASE_URL: ${{ secrets.PROD_API_BASE_URL }}
+          BRUNO_API_TESTS_ENABLED: ${{ vars.BRUNO_API_TESTS_ENABLED || 'true' }}
+        run: ./scripts/integration/bruno-api-tests.sh
 
       - name: Upload API interface report
         if: always()
@@ -199,25 +190,13 @@ jobs:
           path: reports/api-interface/
           if-no-files-found: ignore
 
-  integration-test-suite:
-    name: Integration test suite
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    environment: production
-    needs:
-      - api-interface-tests
-
-    steps:
-      - name: Integration test suite
-        run: echo "still in progress"
-
   frontend-smoke-test:
     name: Frontend smoke test
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
     needs:
-      - integration-test-suite
+      - api-interface-tests
 
     steps:
       - name: Checkout

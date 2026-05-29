@@ -1,0 +1,33 @@
+meta {
+  name: 09 List Available Workers
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/dispatch/v1/workers/available?service_type={{serviceType}}&limit=20
+  body: none
+  auth: none
+}
+
+headers {
+  authorization: Bearer {{customerServiceToken}}
+}
+
+script:post-response {
+  const body = res.getBody();
+  const data = body.data || {};
+  const workers = body.workers || data.workers || [];
+  const preferredWorkerId = bru.getVar("workerId");
+  const worker = workers.find((item) => String(item.worker_id || item.id) === String(preferredWorkerId)) || workers[0];
+  if (worker) {
+    bru.setVar("workerId", String(worker.worker_id || worker.id));
+  }
+}
+
+tests {
+  test("available workers are returned", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("workers").that.is.an("array").and.is.not.empty;
+  });
+}

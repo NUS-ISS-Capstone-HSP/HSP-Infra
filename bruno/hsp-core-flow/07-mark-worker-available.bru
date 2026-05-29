@@ -1,0 +1,29 @@
+meta {
+  name: 07 Mark Worker Available
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseUrl}}/api/worker-schedule/v1/workers/{{workerId}}/status
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{workerToken}}
+}
+
+body:json {
+  {
+    "status": "AVAILABLE"
+  }
+}
+
+tests {
+  test("worker is available for dispatch", function () {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+    expect(res.getBody()).to.have.property("worker");
+  });
+}

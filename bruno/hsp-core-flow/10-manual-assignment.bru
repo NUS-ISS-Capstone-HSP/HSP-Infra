@@ -1,0 +1,35 @@
+meta {
+  name: 10 Manual Assignment
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/dispatch/v1/assignments/manual
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{customerServiceToken}}
+}
+
+body:json {
+  {
+    "order_id": "{{orderId}}",
+    "worker_id": "{{workerId}}"
+  }
+}
+
+script:post-response {
+  const dispatch = res.getBody().dispatch || {};
+  bru.setVar("dispatchId", dispatch.dispatch_id);
+}
+
+tests {
+  test("manual assignment creates a dispatch", function () {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+    expect(res.getBody()).to.have.nested.property("dispatch.dispatch_id").that.is.a("string").and.is.not.empty;
+  });
+}

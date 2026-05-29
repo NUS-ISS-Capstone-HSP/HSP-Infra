@@ -30,23 +30,22 @@ npx playwright install chromium firefox webkit chrome
 npm run test:smoke
 ```
 
-## Dispatch API Interface Test
+## Bruno API Interface Test
 
 ```bash
-DISPATCH_TEST_EMAIL="<email>" \
-DISPATCH_TEST_PASSWORD="<password>" \
-DISPATCH_TEST_ORDER_ID="<order_id>" \
-./scripts/integration/dispatch-api-tests.sh
+BRUNO_API_BASE_URL="http://127.0.0.1:8080" \
+./scripts/integration/bruno-api-tests.sh
 ```
 
 Optional variables:
 
-- `DISPATCH_API_BASE_URL`: API gateway base URL, defaults to local nginx from `env/dev.env`
-- `DISPATCH_API_TESTS_ENABLED`: set to `false` to skip the CD API interface test
-- `DISPATCH_TEST_WORKER_ID`: fixed worker id; otherwise the script picks the first available worker
-- `DISPATCH_TEST_SERVICE_TYPE`, `DISPATCH_TEST_REGION`, `DISPATCH_TEST_AT_TIME`, `DISPATCH_TEST_LIMIT`: filters for `/api/dispatch/v1/workers/available`
+- `BRUNO_API_BASE_URL`: API gateway base URL, defaults to local nginx from `env/dev.env`
+- `BRUNO_HEALTH_PATH`: health endpoint path, defaults to `/api/healthz` for nginx and `/healthz` for direct `:8081` gateway URLs
+- `BRUNO_API_TESTS_ENABLED`: set to `false` to skip the CD API interface test
+- `BRUNO_CLI_PACKAGE`: Bruno CLI package spec, defaults to `@usebruno/cli@2.10.1`
+- `API_TEST_REPORT_DIR`: report output directory, defaults to `reports/api-interface`
 
-Use a disposable or dedicated test order for `DISPATCH_TEST_ORDER_ID`; the manual assignment endpoint changes dispatch state.
+The Bruno collection lives in `bruno/hsp-core-flow` and follows the core flow in `API_DOCUMENTATION.md`: register/login test users, prepare an available worker, create an order, assign a worker, accept and execute service, confirm payment, close the order, then verify order detail, dispatch history, service record, and payment records.
 
 ## Start DB Only (Local Backend Dev)
 
@@ -93,7 +92,7 @@ Default from `env/dev.env` is `localhost:3306`.
 
 - `CI Integration`: starts compose, waits health, runs smoke + order flow checks
 - `Update Image Tag`: updates one service tag from `repository_dispatch` payload
-- `Deploy Production`: manual-approved deploy to production via SSH
+- `Deploy Production`: manual-approved deploy to production via SSH, then runs Bruno API tests and frontend smoke tests
 
 ### repository_dispatch Example
 
@@ -123,9 +122,6 @@ Set these Organization secrets and grant this repository access before enabling 
 - `PROD_INFRA_PATH` (absolute path of infra repo on target host)
 - `PROD_GATEWAY_JWT_SECRET` (shared by api-gateway and user-service JWT signing)
 - `PROD_API_BASE_URL`
-- `DISPATCH_TEST_EMAIL`
-- `DISPATCH_TEST_PASSWORD`
-- `DISPATCH_TEST_ORDER_ID`
 - `ALIYUN_REGISTRY`
 - `ALIYUN_USERNAME`
 - `ALIYUN_PASSWORD`

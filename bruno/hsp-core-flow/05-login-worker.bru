@@ -1,0 +1,40 @@
+meta {
+  name: 05 Login Worker
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/users/v1/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "email": "{{workerEmail}}",
+    "password": "{{testPassword}}"
+  }
+}
+
+script:post-response {
+  const body = res.getBody();
+  const user = body.user || {};
+  const profile = user.worker_profile || {};
+  const workerId = profile.worker_id || profile.workerId || profile.worker_no || profile.workerNo || profile.id || user.worker_id || user.id;
+  bru.setVar("workerToken", body.access_token);
+  if (workerId) {
+    bru.setVar("workerId", String(workerId));
+  }
+}
+
+tests {
+  test("worker login returns a bearer token", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("access_token").that.is.a("string").and.is.not.empty;
+  });
+}

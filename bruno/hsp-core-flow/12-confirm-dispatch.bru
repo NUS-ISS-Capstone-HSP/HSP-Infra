@@ -1,0 +1,29 @@
+meta {
+  name: 12 Confirm Dispatch
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/api/dispatch/v1/dispatches/{{dispatchId}}/confirm
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{workerToken}}
+}
+
+body:json {
+  {
+    "response": "ACCEPT",
+    "reject_reason": null
+  }
+}
+
+tests {
+  test("worker accepts the dispatch", function () {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+  });
+}

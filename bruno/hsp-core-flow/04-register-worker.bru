@@ -1,0 +1,40 @@
+meta {
+  name: 04 Register Worker
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/users/v1/auth/register
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "email": "{{workerEmail}}",
+    "password": "{{testPassword}}",
+    "role": "WORKER",
+    "worker_display_name": "{{workerDisplayName}}"
+  }
+}
+
+script:post-response {
+  const user = res.getBody().user || {};
+  const profile = user.worker_profile || {};
+  const workerId = profile.worker_id || profile.workerId || profile.worker_no || profile.workerNo || profile.id || user.worker_id || user.id;
+  if (workerId) {
+    bru.setVar("workerId", String(workerId));
+  }
+}
+
+tests {
+  test("worker account is registered", function () {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+    expect(res.getBody()).to.have.property("user");
+  });
+}

@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "HSP Core API Flow",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

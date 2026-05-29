@@ -1,0 +1,30 @@
+meta {
+  name: 06 Register Worker Schedule
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/worker-schedule/v1/workers/register
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+  authorization: Bearer {{workerToken}}
+}
+
+body:json {
+  {
+    "worker_id": "{{workerId}}",
+    "worker_name": "{{workerDisplayName}}"
+  }
+}
+
+tests {
+  test("worker is registered in schedule service", function () {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+    expect(res.getBody()).to.have.property("worker");
+  });
+}

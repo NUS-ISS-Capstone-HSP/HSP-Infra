@@ -1,0 +1,22 @@
+meta {
+  name: 20 Verify Payments
+  type: http
+  seq: 20
+}
+
+get {
+  url: {{baseUrl}}/api/finance/v1/orders/{{orderId}}/payments
+  body: none
+  auth: none
+}
+
+headers {
+  authorization: Bearer {{customerServiceToken}}
+}
+
+tests {
+  test("payment list contains records", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("payments").that.is.an("array").and.is.not.empty;
+  });
+}

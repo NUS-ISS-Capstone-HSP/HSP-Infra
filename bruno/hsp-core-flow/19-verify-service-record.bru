@@ -1,0 +1,22 @@
+meta {
+  name: 19 Verify Service Record
+  type: http
+  seq: 19
+}
+
+get {
+  url: {{baseUrl}}/api/service-execution/v1/orders/{{orderId}}/record
+  body: none
+  auth: none
+}
+
+headers {
+  authorization: Bearer {{workerToken}}
+}
+
+tests {
+  test("service record can be fetched", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("record");
+  });
+}

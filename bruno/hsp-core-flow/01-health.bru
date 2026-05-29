@@ -1,0 +1,42 @@
+meta {
+  name: 01 Health and Test Data
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}{{healthPath}}
+  body: none
+  auth: none
+}
+
+script:post-response {
+  const now = Date.now();
+  const runId = `${now}-${Math.floor(Math.random() * 100000)}`;
+  const tomorrow = new Date(now + 24 * 60 * 60 * 1000);
+  const startAt = new Date(tomorrow.getTime() + 60 * 60 * 1000);
+  const completeAt = new Date(startAt.getTime() + 90 * 60 * 1000);
+  const paidAt = new Date(completeAt.getTime() + 15 * 60 * 1000);
+
+  bru.setVar("runId", runId);
+  bru.setVar("customerServiceEmail", `bruno-cs-${runId}@hsp.local`);
+  bru.setVar("workerEmail", `bruno-worker-${runId}@hsp.local`);
+  bru.setVar("testPassword", `BrunoTest!${runId}A`);
+  bru.setVar("workerDisplayName", `Bruno Worker ${runId}`);
+  bru.setVar("customerName", `Bruno Customer ${runId}`);
+  bru.setVar("phone", "13800000000");
+  bru.setVar("serviceAddress", `Bruno Test Address ${runId}`);
+  bru.setVar("serviceType", "CLEANING");
+  bru.setVar("appointmentTime", tomorrow.toISOString());
+  bru.setVar("startedAt", startAt.toISOString());
+  bru.setVar("completedAt", completeAt.toISOString());
+  bru.setVar("paidAt", paidAt.toISOString());
+  bru.setVar("paymentAmount", "26800");
+}
+
+tests {
+  test("gateway is healthy", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.property("status");
+  });
+}

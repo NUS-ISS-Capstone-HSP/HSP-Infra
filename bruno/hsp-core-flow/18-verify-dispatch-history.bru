@@ -1,0 +1,21 @@
+meta {
+  name: 18 Verify Dispatch History
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{baseUrl}}/api/dispatch/v1/orders/{{orderId}}/history
+  body: none
+  auth: none
+}
+
+headers {
+  authorization: Bearer {{customerServiceToken}}
+}
+
+tests {
+  test("dispatch history can be fetched", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

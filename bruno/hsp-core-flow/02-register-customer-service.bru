@@ -1,0 +1,30 @@
+meta {
+  name: 02 Register Customer Service
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/users/v1/auth/register
+  body: json
+  auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "email": "{{customerServiceEmail}}",
+    "password": "{{testPassword}}",
+    "role": "CUSTOMER_SERVICE"
+  }
+}
+
+tests {
+  test("customer service account is registered", function () {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+    expect(res.getBody()).to.have.property("user");
+  });
+}
