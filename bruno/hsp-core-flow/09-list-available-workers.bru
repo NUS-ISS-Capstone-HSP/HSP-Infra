@@ -31,3 +31,8 @@ tests {
     expect(res.getBody()).to.have.property("workers").that.is.an("array").and.is.not.empty;
   });
 }
+
+assert {
+  res.status: eq 200
+  res.body.workers: isArray
+}

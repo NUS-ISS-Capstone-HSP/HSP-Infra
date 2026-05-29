@@ -40,3 +40,8 @@ tests {
     expect(res.getBody()).to.have.property("status");
   });
 }
+
+assert {
+  res.status: eq 200
+  res.body.status: eq ok
+}

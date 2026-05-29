@@ -20,3 +20,8 @@ tests {
     expect(res.getBody()).to.have.property("payments").that.is.an("array").and.is.not.empty;
   });
 }
+
+assert {
+  res.status: eq 200
+  res.body.payments: isArray
+}

@@ -32,3 +32,8 @@ tests {
     expect(res.getBody()).to.have.property("access_token").that.is.a("string").and.is.not.empty;
   });
 }
+
+assert {
+  res.status: eq 200
+  res.body.access_token: isNotEmpty
+}

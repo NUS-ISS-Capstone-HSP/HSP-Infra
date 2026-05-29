@@ -37,3 +37,9 @@ tests {
     expect(res.getBody()).to.have.nested.property("order.order_id").that.is.a("string").and.is.not.empty;
   });
 }
+
+assert {
+  res.status: eq 200
+  res.body.order.order_id: isNotEmpty
+  res.body.order.customer_name: eq {{customerName}}
+}
