@@ -123,7 +123,7 @@ jobs:
     timeout-minutes: 20
     environment: production
     needs:
-      - Production deployment
+      - deploy
 
     steps:
       - name: Gateway health check
