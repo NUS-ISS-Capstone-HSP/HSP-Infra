@@ -117,18 +117,6 @@ jobs:
             set -eu
             docker exec hsp-nginx nginx -s reload
 
-  prepare-verification-context:
-    name: Prepare verification context
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    environment: production
-    needs:
-      - deploy
-
-    steps:
-      - name: Prepare verification context
-        run: echo "still in progress"
-
   gateway-health-check:
     name: Gateway health check
     runs-on: ubuntu-latest
