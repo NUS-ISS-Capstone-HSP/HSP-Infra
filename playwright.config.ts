@@ -10,7 +10,7 @@ export default defineConfig({
     ? [['list'], ['html', { open: 'never' }]]
     : [['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://115.190.232.179',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://115.190.232.179',
     trace: 'on-first-retry',
   },
 

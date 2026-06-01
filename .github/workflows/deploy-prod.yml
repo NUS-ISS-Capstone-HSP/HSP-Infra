@@ -126,8 +126,33 @@ jobs:
       - deploy
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate gateway health check inputs
+        shell: bash
+        env:
+          PROD_API_BASE_URL: ${{ secrets.PROD_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PROD_API_BASE_URL}" ]]; then
+            echo "Missing secret: PROD_API_BASE_URL" >&2
+            exit 1
+          fi
+
       - name: Gateway health check
-        run: echo "still in progress"
+        shell: bash
+        env:
+          GATEWAY_HEALTH_BASE_URL: ${{ secrets.PROD_API_BASE_URL }}
+        run: ./scripts/integration/gateway-health-check.sh
+
+      - name: Upload gateway health report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gateway-health-report
+          path: reports/gateway-health/
+          if-no-files-found: ignore
 
   api-interface-tests:
     name: API interface tests
@@ -203,6 +228,8 @@ jobs:
         run: npx playwright install --with-deps chromium firefox webkit chrome
 
       - name: Run frontend smoke test
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ secrets.PROD_WEB_BASE_URL || secrets.PROD_API_BASE_URL }}
         run: npm run test:smoke
 
       - name: Upload Playwright report
@@ -218,12 +245,76 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
+    if: always()
     needs:
+      - deploy
+      - gateway-health-check
+      - api-interface-tests
       - frontend-smoke-test
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Publish verification summary
         shell: bash
+        env:
+          PROD_API_BASE_URL: ${{ secrets.PROD_API_BASE_URL }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+          GATEWAY_RESULT: ${{ needs.gateway-health-check.result }}
+          API_TEST_RESULT: ${{ needs.api-interface-tests.result }}
+          FRONTEND_RESULT: ${{ needs.frontend-smoke-test.result }}
+          GITHUB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
-          echo "still in progress"
+
+          {
+            echo "## Production Deployment Verification"
+            echo
+            echo "| Stage | Result |"
+            echo "| --- | --- |"
+            echo "| Deploy production stack | ${DEPLOY_RESULT} |"
+            echo "| Gateway health check | ${GATEWAY_RESULT} |"
+            echo "| Bruno API interface tests | ${API_TEST_RESULT} |"
+            echo "| Frontend smoke test | ${FRONTEND_RESULT} |"
+            echo
+            echo "| Deployment | Value |"
+            echo "| --- | --- |"
+            echo "| API base URL | \`${PROD_API_BASE_URL}\` |"
+            echo "| Workflow run | ${GITHUB_RUN_URL} |"
+            echo
+            echo "### Image Manifest"
+            echo
+            echo "| Service | Image | Tag |"
+            echo "| --- | --- | --- |"
+          } >>"${GITHUB_STEP_SUMMARY}"
+
+          services=(
+            API_GATEWAY
+            USER_SERVICE
+            ORDER_SERVICE
+            WORKER_SCHEDULE_SERVICE
+            DISPATCH_SERVICE
+            EXECUTION_RECORD_SERVICE
+            PAYMENT_SETTLEMENT_SERVICE
+            FRONTEND
+          )
+
+          set -a
+          source env/image-tags.env
+          set +a
+
+          for service in "${services[@]}"; do
+            image_key="${service}_IMAGE"
+            tag_key="${service}_TAG"
+            image="${!image_key:-}"
+            tag="${!tag_key:-}"
+            if [[ -n "${image}" || -n "${tag}" ]]; then
+              echo "| ${service} | \`${image}\` | \`${tag}\` |" >>"${GITHUB_STEP_SUMMARY}"
+            fi
+          done
+
+          if [[ "${DEPLOY_RESULT}" != "success" || "${GATEWAY_RESULT}" != "success" || "${API_TEST_RESULT}" != "success" || "${FRONTEND_RESULT}" != "success" ]]; then
+            echo "One or more production verification stages failed." >&2
+            exit 1
+          fi

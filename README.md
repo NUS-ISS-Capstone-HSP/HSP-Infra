@@ -47,6 +47,21 @@ Optional variables:
 
 The Bruno collection lives in `bruno/hsp-core-flow` and follows the core flow in `API_DOCUMENTATION.md`: register/login test users, prepare an available worker, create an order, assign a worker, accept and execute service, confirm payment, close the order, then verify order detail, dispatch history, service record, and payment records.
 
+## Gateway Health Check
+
+```bash
+GATEWAY_HEALTH_BASE_URL="http://127.0.0.1:8080" \
+./scripts/integration/gateway-health-check.sh
+```
+
+Optional variables:
+
+- `GATEWAY_HEALTH_BASE_URL`: API gateway base URL, defaults to `PROD_API_BASE_URL`, `BRUNO_API_BASE_URL`, or local nginx from `env/dev.env`
+- `GATEWAY_HEALTH_PATH`: health endpoint path, defaults to `/api/healthz` for nginx and `/healthz` for direct `:8081` gateway URLs
+- `GATEWAY_HEALTH_TIMEOUT_SECONDS`: total wait time, defaults to `180`
+- `GATEWAY_HEALTH_INTERVAL_SECONDS`: retry interval, defaults to `5`
+- `GATEWAY_HEALTH_REPORT_DIR`: report output directory, defaults to `reports/gateway-health`
+
 ## Start DB Only (Local Backend Dev)
 
 ```bash
@@ -92,7 +107,7 @@ Default from `env/dev.env` is `localhost:3306`.
 
 - `CI Integration`: starts compose, waits health, runs smoke + order flow checks
 - `Update Image Tag`: updates one service tag from `repository_dispatch` payload
-- `Deploy Production`: manual-approved deploy to production via SSH, then runs Bruno API tests and frontend smoke tests
+- `Deploy Production`: manual-approved deploy to production via SSH, then runs gateway health check, Bruno API tests, frontend smoke tests, and publishes a deployment verification summary with image manifest
 
 ### repository_dispatch Example
 
@@ -122,6 +137,7 @@ Set these Organization secrets and grant this repository access before enabling 
 - `PROD_INFRA_PATH` (absolute path of infra repo on target host)
 - `PROD_GATEWAY_JWT_SECRET` (shared by api-gateway and user-service JWT signing)
 - `PROD_API_BASE_URL`
+- `PROD_WEB_BASE_URL` (optional, defaults frontend smoke tests to `PROD_API_BASE_URL`)
 - `ALIYUN_REGISTRY`
 - `ALIYUN_USERNAME`
 - `ALIYUN_PASSWORD`
